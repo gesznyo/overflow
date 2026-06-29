@@ -80,12 +80,19 @@ var yarp = builder.AddYarp("gateway")
         yarpBuilder.AddRoute("/tags/{**catch-all}", questionService);
         yarpBuilder.AddRoute("/search/{**catch-all}", searchService);
     })
-    .WithHostPort(8001)
-    .WithEndpoint(port: 8001, targetPort: 8001, scheme: "http", name: "gateway", isExternal: true)
-    .WithEnvironment(name: "ASPNETCORE_URLS", "http://*:8001")
+    .WithHttpEndpoint(port: 8001, name: "http" )
+    .WithoutHttpsCertificate()
+    // .WithHostPort(8001)
+    // .WithEndpoint(port: 8001, targetPort: 8001, scheme: "http", name: "gateway", isExternal: true)
+    // .WithEnvironment(name: "ASPNETCORE_URLS", "http://*:8001")
     .WithEnvironment(name: "VIRTUAL_HOST", "api.overflow.local")
     .WithEnvironment(name: "VIRTUAL_PORT", "8001");
 
+var webapp = builder
+    .AddJavaScriptApp(name: "webapp", appDirectory: "../webapp")
+    .WithReference(keycloak)
+    .WithHttpEndpoint(env: "PORT", port: 3000);
+    
 if (!builder.Environment.IsDevelopment())
 {
     builder.AddContainer("nginx-proxy", "nginxproxy/nginx-proxy", "1.11")
