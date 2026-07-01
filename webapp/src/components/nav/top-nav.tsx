@@ -1,7 +1,8 @@
 ﻿import Link from "next/link";
 import {AcademicCapIcon} from "@heroicons/react/24/solid";
-import {Button, SearchField} from "@heroui/react";
+import {Button} from "@heroui/react";
 import ThemeToggle from "@/components/nav/theme-toggle";
+import SearchInput from "@/components/nav/search-input";
 
 export default function TopNav() {
     return (
@@ -20,13 +21,7 @@ export default function TopNav() {
                     </nav>
                 </div>
                 
-                <SearchField name="search" className={'ml-6 min-w-2/5'}>
-                    <SearchField.Group>
-                        <SearchField.SearchIcon />
-                        <SearchField.Input className="w-70" placeholder="Search" />
-                        <SearchField.ClearButton className="text-red-500" />
-                    </SearchField.Group>
-                </SearchField>
+                <SearchInput />
                 
                 <div className={'flex shrink-0 justify-end gap-3 ms-auto'}>
                     <ThemeToggle />

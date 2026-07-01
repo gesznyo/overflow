@@ -2,6 +2,7 @@
 
 import {Button, Tabs} from "@heroui/react";
 import Link from "next/link";
+import {useTagStore} from "@/lib/use-tag-store";
 
 type Props = {
     tag?: string;
@@ -9,6 +10,8 @@ type Props = {
 }
 
 export default function QuestionsHeader({tag, total}: Props) {
+    
+    const selectedTag = useTagStore((state) => state.getTagBySlug(tag ?? ''));
     
     const tabs = [
         {key: 'newest', label: 'Newest'},
@@ -19,9 +22,13 @@ export default function QuestionsHeader({tag, total}: Props) {
     return (
         <div className={'flex flex-col w-full border-b gap-4 pb-4'}>
             <div className={'flex justify-between px-6'}>
-                <div className={'text-3xl font-semibold'}>
-                    {tag? `[${tag}]` : 'Newest Questions'}
+                <div className={'flex flex-col items-start gap-2'}>
+                    <div className={'text-3xl font-semibold'}>
+                        {tag? `[${tag}]` : 'Newest Questions'}
+                    </div>
+                    <p className={'font-light'}>{selectedTag?.description}</p>
                 </div>
+
                 <Link href={'/questions/ask'}>
                     <Button variant={'secondary'}>
                         Ask Question
