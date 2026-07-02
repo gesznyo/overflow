@@ -39,7 +39,7 @@ export default function SearchInput() {
     
     return (
         <div className={'flex flex-col w-full me-10'}>
-            <SearchField name="search" className={'ml-6 min-w-2/5'}>
+            <SearchField name="search" className={'ml-6 min-w-2/5'} aria-label={'Search'}>
                 <SearchField.Group>
                     <SearchField.SearchIcon />
                     <SearchField.Input
