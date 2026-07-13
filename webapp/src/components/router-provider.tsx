@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-aria-components';
 import { useRouter } from 'next/navigation';
 import {ThemeProvider as NextThemesProvider} from "next-themes";
 import { Toast } from '@heroui/react';
-import {useTagStore} from "@/lib/use-tag-store";
+import {useTagStore} from "@/lib/hooks/use-tag-store";
 import {useEffect} from "react";
 import {getTags} from "@/lib/actions/tag-actions";
 

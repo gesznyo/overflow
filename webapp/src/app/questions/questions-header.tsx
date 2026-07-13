@@ -2,7 +2,7 @@
 
 import {Button, Tabs} from "@heroui/react";
 import Link from "next/link";
-import {useTagStore} from "@/lib/use-tag-store";
+import {useTagStore} from "@/lib/hooks/use-tag-store";
 
 type Props = {
     tag?: string;

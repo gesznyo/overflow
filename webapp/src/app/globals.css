@@ -1,7 +1,14 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+/* Inject standard animation utilities as a clean layer override */
+@import "./spinner.css";
+
 @plugin "@tailwindcss/typography";
+
+.ProseMirror:focus {
+    outline: none;
+}
 
 :root,
 .light,
