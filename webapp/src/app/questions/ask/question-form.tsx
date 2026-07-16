@@ -6,13 +6,16 @@ import {Button, FieldError, Input, Label, ListBox, Select, Spinner, TextField} f
 import {questionSchema, QuestionSchema} from "@/lib/schemas/question-schema";
 import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import RichTextEditor from "@/components/rte/rich-text-editor";
 import clsx from "clsx";
 import {useRouter} from "next/navigation";
 import {postQuestion, updateQuestion} from "@/lib/actions/question-actions";
 import {handleError} from "@/lib/util";
 import {Question} from "@/lib/types";
 import {useEffect, useTransition} from "react";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(()=> 
+    import('@/components/rte/rich-text-editor'), {ssr: false});
 
 type Props = {
     questionToUpdate?: Question

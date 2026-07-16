@@ -7,7 +7,7 @@ import {searchQuestions} from "@/lib/actions/question-actions";
 
 export default function SearchInput() {
     const [query, setQuery] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
+    const [, setLoading] = useState<boolean>(false);
     const [results, setResults] = useState<Question[] | null>(null);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Hosting;
+// ReSharper disable UnusedVariable
 
 #pragma warning disable ASPIRECERTIFICATES001
 var builder = DistributedApplication.CreateBuilder(args);
@@ -73,32 +74,55 @@ var searchService = builder
     .WaitFor(typesense)
     .WaitFor(rabbitmq);
 
-var yarp = builder.AddYarp("gateway")
-    .WithConfiguration(yarpBuilder =>
-    {
-        yarpBuilder.AddRoute("/questions/{**catch-all}", questionService);
-        yarpBuilder.AddRoute("/test/{**catch-all}", questionService);
-        yarpBuilder.AddRoute("/tags/{**catch-all}", questionService);
-        yarpBuilder.AddRoute("/search/{**catch-all}", searchService);
-    })
-    .WithHttpEndpoint(port: 8001, name: "http" )
-    .WithoutHttpsCertificate()
-    // .WithHostPort(8001)
-    // .WithEndpoint(port: 8001, targetPort: 8001, scheme: "http", name: "gateway", isExternal: true)
-    // .WithEnvironment(name: "ASPNETCORE_URLS", "http://*:8001")
-    .WithEnvironment(name: "VIRTUAL_HOST", "api.overflow.local")
-    .WithEnvironment(name: "VIRTUAL_PORT", "8001");
+
+if (!builder.Environment.IsDevelopment())
+{
+    var yarp = builder.AddYarp("gateway")
+        .WithConfiguration(yarpBuilder =>
+        {
+            yarpBuilder.AddRoute("/questions/{**catch-all}", questionService);
+            yarpBuilder.AddRoute("/tags/{**catch-all}", questionService);
+            yarpBuilder.AddRoute("/search/{**catch-all}", searchService);
+            yarpBuilder.AddRoute("/test/{**catch-all}", questionService);
+        })
+        .WithEnvironment("ASPNETCORE_URLS", "http://*:8001")
+        .WithEndpoint(port: 8001, scheme: "http", targetPort: 8001, name: "gateway", isExternal: true)
+        .WithEnvironment("VIRTUAL_HOST", "api.overflow.local")
+        .WithEnvironment("VIRTUAL_PORT", "8001");
+}
+else
+{
+    var yarp = builder.AddYarp("gateway")
+        .WithConfiguration(yarpBuilder =>
+        {
+            yarpBuilder.AddRoute("/questions/{**catch-all}", questionService);
+            yarpBuilder.AddRoute("/test/{**catch-all}", questionService);
+            yarpBuilder.AddRoute("/tags/{**catch-all}", questionService);
+            yarpBuilder.AddRoute("/search/{**catch-all}", searchService);
+        })
+        .WithHttpEndpoint(port: 8001, name: "http")
+        .WithoutHttpsCertificate();
+}
+
 
 var webapp = builder
     .AddJavaScriptApp(name: "webapp", appDirectory: "../webapp")
     .WithReference(keycloak)
-    .WithHttpEndpoint(env: "PORT", port: 3000);
+    .WithHttpEndpoint(env: "PORT", port: 3000, targetPort: 4000)
+    .WithEnvironment(name: "VIRTUAL_HOST", "app.overflow.local")
+    .WithEnvironment(name: "VIRTUAL_PORT", "4000")
+    .PublishAsDockerFile();
     
 if (!builder.Environment.IsDevelopment())
 {
     builder.AddContainer("nginx-proxy", "nginxproxy/nginx-proxy", "1.11")
         .WithEndpoint(port: 80, targetPort:80, "nginx", isExternal: true)
-        .WithBindMount(source: "/var/run/docker.sock", target: "/tmp/docker.sock", isReadOnly: true);
+        .WithEndpoint(port: 443, targetPort:443, "nginx-ssl", isExternal: true)
+        .WithBindMount(source: "/var/run/docker.sock", target: "/tmp/docker.sock", isReadOnly: true)
+        .WithBindMount(source: "../infra/devcerts", target: "/etc/nginx/certs", isReadOnly: true);
+    
+    keycloak.WithEnvironment("KC_HOSTNAME", "https://id.overflow.local")
+        .WithEnvironment("KC_HOSTNAME_BACKCHANNEL_DYNAMIC", "true");
 }
 
 builder.Build().Run();

@@ -6,9 +6,12 @@ import {answerSchema, AnswerSchema} from "@/lib/schemas/answer-schema";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {editAnswer, postAnswer} from "@/lib/actions/question-actions";
 import {handleError} from "@/lib/util";
-import RichTextEditor from "@/components/rte/rich-text-editor";
 import {Button} from "@heroui/react";
 import {useAnswerStore} from "@/lib/hooks/use-answer-store";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(()=>
+    import('@/components/rte/rich-text-editor'), {ssr: false});
 
 type Props = {
     questionId: string;
